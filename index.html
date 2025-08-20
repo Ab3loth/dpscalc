@@ -1,138 +1,358 @@
-<DOCUMENT filename="index.html">
+<!DOCTYPE html>
+<html lang="en">
 
-    
-        Base Damage 
-        <input type="text" id="baseDamage">
-        
-        Base SPA 
-        <input type="text" id="baseSPA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPS Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
 
-        Technique
+<body>
+    <div class="form-grid">
+        <label>Base Damage <input type="text" id="baseDmg" value="0"></label>
+        <label>Base SPA <input type="text" id="baseSpa" value="0"></label>
+
+        <label>Technique
             <select id="technique">
-            <option value="1">Select</option>
-            <option value="1.2">Glitched</option>
-            <option value="1.5">All Seeing</option>
-            <option value="1.8">Avatar</option>
-            <option value="2">Overlord</option>
-        </select>
+                <option value="">Select</option>
+                <option value="Glitched">Glitched</option>
+                <option value="All Seeing">All Seeing</option>
+                <option value="Avatar">Avatar</option>
+                <option value="Overlord">Overlord</option>
+            </select>
+        </label>
 
-
-        
-
-        Enchant
+        <label>Enchant
             <select id="enchant">
-            <option value="1">Select</option>
-            <option value="1.3">Mystical</option>
-            <option value="1.6">Glorious</option>
-            <option value="2">Mastery</option>
-        </select>
+                <option value="">Select</option>
+                <option value="Mystical">Mystical</option>
+                <option value="Glorious">Glorious</option>
+                <option value="Mastery">Mastery</option>
+            </select>
+        </label>
 
-
-        
-
-        Skill Tree
+        <label>Skill Tree
             <select id="skillTree">
-            <option value="1">Select</option>
-            <option value="1.4">Damage</option>
-            <option value="1.7">Critical</option>
-        </select>
+                <option value="">Select</option>
+                <option value="Dmg">Damage</option>
+                <option value="Crit">Critical</option>
+            </select>
+        </label>
 
-
-        
-
-        Status Effect
+        <label>Status Effect
             <select id="statusEffect">
-            <option value="1">None</option>
-            <option value="1.1">Bolt</option>
-            <option value="1.15">Bleed</option>
-            <option value="1.2">Hemorrhage</option>
-            <option value="1.25">Flame</option>
-            <option value="1.3">Mutilate</option>
-            <option value="1.35">Black Flames</option>
-            <option value="1.4">Blizzard</option>
-            <option value="1.45">Sunburn</option>
-            <option value="1.5">Blue Flame</option>
-            <option value="1.55">Plasma</option>
-            <option value="1.6">Dismantle</option>
-            <option value="1.65">Blaze</option>
-            <option value="1.7">Hex</option>
-            <option value="1.75">Electrify</option>
-            <option value="1.8">Poison</option>
-            <option value="1.85">Detonation</option>
-            <option value="1.9">Rupture</option>
-        </select>
+                <option value="none">None</option>
+                <option value="bolt">Bolt</option>
+                <option value="bleed">Bleed</option>
+                <option value="hemorrhage">Hemorrhage</option>
+                <option value="flame">Flame</option>
+                <option value="mutilate">Mutilate</option>
+                <option value="blackflames">Black Flames</option>
+                <option value="blizzard">Blizzard</option>
+                <option value="sunburn">Sunburn</option>
+                <option value="blueflame">Blue Flame</option>
+                <option value="plasma">Plasma</option>
+                <option value="dismantle">Dismantle</option>
+                <option value="blaze">Blaze</option>
+                <option value="hex">Hex</option>
+                <option value="electrify">Electrify</option>
+                <option value="poison">Poison</option>
+                <option value="detonation">Detonation</option>
+                <option value="rupture">Rupture</option>
+            </select>
+        </label>
+    </div>
 
+    <button onclick="calculate()">Calculate</button>
+    <div id="result"></div>
+</body>
 
-        Unit Element
-        <select id="unitElement">
-            <option value="Neutral">Neutral</option>
-            <option value="Fire">Fire</option>
-            <option value="Water">Water</option>
-            <option value="Nature">Nature</option>
-            <option value="Light">Light</option>
-            <option value="Dark">Dark</option>
-            <option value="Perfect Seal">Perfect Seal</option>
-            <option value="Omnipotent">Omnipotent</option>
-        </select>
+<script>
+    function formatStat(value, options = {}) {
+        const {
+            isPercent = false, maxDecimals = 2
+        } = options;
 
-        Enemy Element
-        <select id="enemyElement">
-            <option value="Neutral">Neutral</option>
-            <option value="Fire">Fire</option>
-            <option value="Water">Water</option>
-            <option value="Nature">Nature</option>
-            <option value="Light">Light</option>
-            <option value="Dark">Dark</option>
-        </select>
+        let formatted;
+        if (value >= 100) {
+            formatted = Math.round(value).toLocaleString();
+        } else if (value >= 10) {
+            formatted = Number(value.toFixed(1)).toLocaleString();
+        } else {
+            formatted = Number(value.toFixed(maxDecimals)).toLocaleString();
+        }
 
+        return isPercent ? formatted + "%" : formatted;
+    }
 
-        
-    <input type="button" value="Calculate" onclick="calculateDPS()">
+    function calculate() {
+        const baseDmg = parseFloat(document.getElementById('baseDmg').value) || 0;
+        const baseSpa = parseFloat(document.getElementById('baseSpa').value) || 0;
+        const technique = document.getElementById('technique').value;
+        const enchant = document.getElementById('enchant').value;
+        const skillTree = document.getElementById('skillTree').value;
+        const statusEffect = document.getElementById('statusEffect').value;
 
-    <script>
-        function getElementalMultiplier(unitElement, enemyElement) {
-            if (unitElement === "Perfect Seal") return 2;
-            if (unitElement === "Omnipotent") return 1.5;
-            if (unitElement === "Neutral" || enemyElement === "Neutral") return 1;
+        if (!technique || !enchant || !skillTree) {
+            alert('Please select all options');
+            return;
+        }
 
-            const weaknesses = {
-                Fire: "Nature",
-                Water: "Fire",
-                Nature: "Water",
-                Dark: "Light",
-                Light: "Dark"
-            };
+        const baseCd = 0.5;
+        const baseCc = 0;
 
-            if (weaknesses[unitElement] === enemyElement) {
-                return 3;
-            } else if (weaknesses[enemyElement] === unitElement) {
-                return 1/3;
+        let techDmg = 0,
+            techSpaRed = 0,
+            techCc = 0,
+            techCd = 0;
+        switch (technique) {
+            case 'Glitched':
+                techDmg = 8.5;
+                techSpaRed = 0.15;
+                techCc = 0.15;
+                techCd = 0.75;
+                break;
+            case 'All Seeing':
+                techDmg = 1.25;
+                techSpaRed = 0;
+                techCc = 0.25;
+                techCd = 1;
+                break;
+            case 'Avatar':
+                techDmg = 6.5;
+                techSpaRed = 0.15;
+                techCc = 0.15;
+                techCd = 0.25;
+                break;
+            case 'Overlord':
+                techDmg = 5.25;
+                techSpaRed = 0.15;
+                techCc = 0.15;
+                techCd = 0.25;
+                break;
+        }
+
+        let enchDmg = 0,
+            enchSpaRed = 0,
+            enchCc = 0,
+            enchCd = 0;
+        switch (enchant) {
+            case 'Mystical':
+                enchDmg = 1.6;
+                enchSpaRed = 0.075;
+                enchCc = 0.05;
+                enchCd = 0.15;
+                break;
+            case 'Glorious':
+                enchDmg = 1.45;
+                enchSpaRed = 0.055;
+                enchCc = 0;
+                enchCd = 0.075;
+                break;
+            case 'Mastery':
+                enchDmg = 1.15;
+                enchSpaRed = 0.05;
+                enchCc = 0;
+                enchCd = 0.05;
+                break;
+        }
+
+        let stDmg = 0,
+            stSpaRed = 0,
+            stCc = 0,
+            stCd = 0;
+        switch (skillTree) {
+            case 'Dmg':
+                stDmg = 0.9;
+                stSpaRed = 0.27;
+                stCc = 0.15;
+                stCd = 0;
+                break;
+            case 'Crit':
+                stDmg = 0.05;
+                stSpaRed = 0.16;
+                stCc = 0.30;
+                stCd = 1.20;
+                break;
+        }
+
+        const dotConfigs = {
+            none: {
+                spaReq: 0,
+                multiplier: 0
+            },
+            bolt: {
+                spaReq: 5,
+                multiplier: 1.2
+            },
+            bleed: {
+                spaReq: 6,
+                multiplier: 1.4
+            },
+            hemorrhage: {
+                spaReq: 3,
+                multiplier: 1.4
+            },
+            flame: {
+                spaReq: 8,
+                multiplier: 1.2
+            },
+            mutilate: {
+                spaReq: 8,
+                multiplier: 2.0
+            },
+            blackflames: {
+                spaReq: 10,
+                multiplier: 4.8
+            },
+            blizzard: {
+                spaReq: 9,
+                multiplier: 1.9
+            },
+            sunburn: {
+                spaReq: 7,
+                multiplier: 1.75
+            },
+            blueflame: {
+                spaReq: 5,
+                multiplier: 1.3
+            },
+            plasma: {
+                spaReq: 7,
+                multiplier: 1.55
+            },
+            dismantle: {
+                spaReq: 6,
+                multiplier: 2.3
+            },
+            blaze: {
+                spaReq: 7,
+                multiplier: 1.5
+            },
+            hex: {
+                spaReq: 6,
+                multiplier: 0.5
+            },
+            electrify: {
+                spaReq: 3,
+                multiplier: 0.3
+            },
+            poison: {
+                spaReq: 6,
+                multiplier: 2.3
+            },
+            detonation: {
+                spaReq: 7,
+                multiplier: 4.2
+            },
+            rupture: {
+                spaReq: 14,
+                multiplier: 5.4
+            },
+        };
+
+        const dmgStat = baseDmg * 3.7 * 1.12 * 1.25 * (techDmg + stDmg) * enchDmg;
+        const spaStat = baseSpa * (1 - 0.125 - techSpaRed - enchSpaRed - stSpaRed);
+        const ccStat = baseCc + techCc + enchCc + stCc;
+        const cdStat = baseCd + techCd + enchCd + stCd;
+        const dps = (1 / spaStat) * dmgStat * (1 + cdStat * ccStat);
+
+        let dotDps = 0;
+        let uptimeRatio = null;
+
+        if (statusEffect !== 'none') {
+            const {
+                spaReq,
+                multiplier
+            } = dotConfigs[statusEffect];
+            const effectDuration = spaReq;
+            const attackInterval = spaStat;
+            const attacksInDuration = effectDuration / attackInterval;
+            const reapplicationPoint = Math.ceil(attacksInDuration);
+            const totalCycleTime = reapplicationPoint * attackInterval;
+            uptimeRatio = effectDuration / totalCycleTime;
+            const rawDotDamage = dmgStat * multiplier;
+            const dotDamagePerCycle = rawDotDamage * uptimeRatio;
+            dotDps = dotDamagePerCycle / totalCycleTime;
+        };
+        const totalDps = dps + dotDps;
+
+        const resultDiv = document.getElementById('result');
+        const stats = [{
+                label: "DMG Stat",
+                value: formatStat(dmgStat),
+                class: "green"
+            },
+            {
+                label: "SPA Stat",
+                value: formatStat(spaStat, {
+                    maxDecimals: 3
+                }),
+                class: "green"
+            },
+            {
+                label: "CC Stat",
+                value: formatStat(ccStat * 100, {
+                    isPercent: true,
+                    maxDecimals: 1
+                }),
+                class: "green"
+            },
+            {
+                label: "CD Stat",
+                value: formatStat(cdStat * 100, {
+                    isPercent: true,
+                    maxDecimals: 1
+                }),
+                class: "green"
+            },
+            ...(statusEffect !== 'none' ? [{
+                    label: "Status Effect",
+                    value: statusEffect,
+                    class: "yellow"
+                },
+                {
+                    label: "Status DPS",
+                    value: formatStat(dotDps, {
+                        maxDecimals: 4
+                    }),
+                    class: "red"
+                },
+                ...(uptimeRatio !== null ? [{
+                    label: "Uptime Ratio",
+                    value: formatStat(uptimeRatio * 100, {
+                        isPercent: true,
+                        maxDecimals: 2
+                    }),
+                    class: "green"
+                }] : [])
+            ] : []),
+            {
+                label: "Total DPS",
+                value: formatStat(totalDps, {
+                    maxDecimals: 4
+                }),
+                class: "green"
+            },
+            {
+                label: "Base DPS",
+                value: formatStat(dps, {
+                    maxDecimals: 4
+                }),
+                class: "green"
             }
-            return 1;
-        }
+        ];
 
-        function calculateDPS() {
-            const baseDamage = parseFloat(document.getElementById("baseDamage").value) || 0;
-            const baseSPA = parseFloat(document.getElementById("baseSPA").value) || 0;
-            const technique = parseFloat(document.getElementById("technique").value);
-            const enchant = parseFloat(document.getElementById("enchant").value);
-            const skillTree = parseFloat(document.getElementById("skillTree").value);
-            const statusEffect = parseFloat(document.getElementById("statusEffect").value);
-            const unitElement = document.getElementById("unitElement").value;
-            const enemyElement = document.getElementById("enemyElement").value;
+        resultDiv.innerHTML = `
+  <div class="stats">
+    ${stats.map(stat => `
+      <div><span class="bold">${stat.label}:</span> <span class="${stat.class}">${stat.value}</span></div>
+    `).join('')}
+  </div>
+`;
+    }
+</script>
+</body>
 
-            const baseDPS = baseDamage * baseSPA;
-            const modifiedDPS = baseDPS * technique * enchant * skillTree * statusEffect;
-            const elementalMultiplier = getElementalMultiplier(unitElement, enemyElement);
-            const finalDPS = modifiedDPS * elementalMultiplier;
-
-            document.getElementById("result").innerHTML = `
-                Base DPS: ${baseDPS.toFixed(2)}<br>
-                Modified DPS (with multipliers): ${modifiedDPS.toFixed(2)}<br>
-                Elemental Multiplier: ${elementalMultiplier.toFixed(2)}x<br>
-                Final DPS (with elemental): ${finalDPS.toFixed(2)}
-            `;
-        }
-    </script>
-
-</DOCUMENT>
+</html>
