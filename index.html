@@ -253,7 +253,7 @@
         };
 
         const dmgStat = baseDmg * 3.7 * 1.12 * 1.25 * (techDmg + stDmg) * enchDmg;
-        const spaStat = baseSpa * (1 - 0.125 - techSpaRed - enchSpaRed - stSpaRed);
+        const spaStat = baseSpa * 0.875 * (1 - techSpaRed - enchSpaRed - stSpaRed);
         const ccStat = baseCc + techCc + enchCc + stCc;
         const cdStat = baseCd + techCd + enchCd + stCd;
         const dps = (1 / spaStat) * dmgStat * (1 + cdStat * ccStat);
